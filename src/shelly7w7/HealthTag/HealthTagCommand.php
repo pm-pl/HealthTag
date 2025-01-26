@@ -37,12 +37,10 @@ class HealthTagCommand extends Command {
 			if(empty($args[1])) {
 				$sender->sendMessage(TextFormat::RED . "/healthtag settype" . TextFormat::YELLOW . " bar/custom");
 			} else if($args[1] === "bar") {
-				Main::getInstance()->getConfig()->set("type", "bar");
-				Main::getInstance()->getConfig()->save();
+				Main::getInstance()->configdata["type"] = "bar";
 				$sender->sendMessage(TextFormat::RED . "Healthtag type has been set to " . TextFormat::YELLOW . $args[1] . TextFormat::RED . ".");
 			} else if($args[1] === "custom") {
-				Main::getInstance()->getConfig()->set("type", "custom");
-				Main::getInstance()->getConfig()->save();
+				Main::getInstance()->configdata["type"] = "custom";
 				$sender->sendMessage(TextFormat::RED . "Healthtag type has been set to " . TextFormat::YELLOW . $args[1] . TextFormat::RED . ".");
 			} else {
 				$sender->sendMessage(TextFormat::RED . "Invalid type. Available types:" . TextFormat::EOL . TextFormat::YELLOW . "- bar" . TextFormat::EOL . TextFormat::YELLOW . "- custom");
@@ -52,11 +50,12 @@ class HealthTagCommand extends Command {
 				$this->setCustomFormat($sender->getServer()->getPlayerByPrefix($sender->getName()));
 			} else {
 				array_shift($args);
-				Main::getInstance()->getConfig()->set("customformat", implode(" ", $args));
-				Main::getInstance()->getConfig()->save();
+				Main::getInstance()->configdata["customformat"] = implode(" ", $args);
 				$sender->sendMessage(TextFormat::RED . "Successfully changed the custom format for healthtag," . TextFormat::YELLOW . " reload the file to update the changes '/healthtag reload'.");
 			}
 		} else if($action === "reload") {
+			Main::getInstance()->getConfig()->setAll(Main::getInstance()->configdata);
+			Main::getInstance()->getConfig()->save();
 			Main::getInstance()->getConfig()->reload();
 			$sender->sendMessage(TextFormat::RED . "Successfully reloaded configuration file.");
 		} else {
@@ -67,8 +66,7 @@ class HealthTagCommand extends Command {
 	public function setCustomFormat(Player $sender) {
 		$form = new CustomForm(function (Player $sender, $data) {
 			if($data != null) {
-				Main::getInstance()->getConfig()->set("customformat", implode("", $data));
-				Main::getInstance()->getConfig()->save();
+				Main::getInstance()->configdata["customformat"] = implode("", $data);
 				$sender->sendMessage(TextFormat::RED . "Successfully changed the custom format for healthtag," . TextFormat::YELLOW . " reload the file to update the changes '/healthtag reload'.");
 			}
 		});
